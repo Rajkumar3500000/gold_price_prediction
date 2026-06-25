@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Gold Price Prediction</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #FFD700, #FF9800);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px 20px;
+        }
+
+        .wrapper {
+            width: 100%;
+            max-width: 950px;
+            display: grid;
+            grid-template-columns: 1fr 1.3fr;
+            gap: 25px;
+        }
+
+        @media (max-width:768px) {
+            .wrapper {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 18px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        h1 {
+            color: #FF9800;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.6rem;
+        }
+
+        h2 {
+            color: #FF9800;
+            margin-bottom: 15px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #FF9800;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #FF9800;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #F57C00;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #FFF8DC;
+            color: #B8860B;
+            font-weight: bold;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .note {
+            margin-top: 15px;
+            color: #666;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .chart-container {
+            text-align: left;
+        }
+
+        canvas {
+            max-height: 350px;
+        }
+
+        .footer {
+            margin-top: 15px;
+            text-align: center;
+            color: #888;
+            font-size: 13px;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="wrapper">
+
+        <!-- Prediction Section -->
+        <div class="container">
+
+            <h1> AI Gold Price Prediction</h1>
+
+            <form action="/predict" method="POST">
+
+                <input type="number"
+                   name="year"
+                   placeholder="Enter Year"
+                   min="{{ min_year }}"
+                   required>
+
+                <select name="month" required>
+
+                    <option value="" disabled selected>
+                        Select Month
+                    </option>
+
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+
+                </select>
+
+                <button type="submit">
+                    Predict Gold Price
+                </button>
+
+            </form>
+
+            {% if prediction_text %}
+            <div class="result">
+                {{ prediction_text }}
+            </div>
+            {% endif %}
+
+        </div>
+
+
+        <div class="container chart-container">
+
+            <h2>📈Historical Gold Price Trend📈</h2>
+
+            <canvas id="trendChart"></canvas>
+
+        </div>
+
+    </div>
+
+    <script>
+
+        fetch('/chart-data')
+            .then(response => response.json())
+            .then(data => {
+
+                const ctx =
+                    document.getElementById('trendChart').getContext('2d');
+
+                new Chart(ctx, {
+
+                    type: 'line',
+
+                    data: {
+                        labels: data.labels,
+
+                        datasets: [{
+                            label: 'Gold Price (₹)',
+
+                            data: data.values,
+
+                            borderColor: '#FFD700',
+                            backgroundColor: 'rgba(255,215,0,0.2)',
+
+                            borderWidth: 3,
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+
+                    options: {
+                        responsive: true,
+
+                        plugins: {
+                            legend: {
+                                display: true
+                            }
+                        },
+
+                        scales: {
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            },
+
+                            y: {
+                                beginAtZero: false
+                            }
+                        }
+                    }
+
+                });
+
+            });
+
+    </script>
+
+</body>
+
+</html>
